@@ -1,0 +1,44 @@
+{
+  "name": "sa-auth-server",
+  "title": "Smart Academy authorization server",
+  "version": "1.0.0",
+  "description": "this server takes full control over the auth API and users data",
+  "main": "server.js",
+  "scripts": {
+    "build": "tsc -w",
+    "dev": "npm run open_docs_win && nodemon build/server.js",
+    "start": "node build/server.js",
+    "open_docs_win": "start http://172.16.18.209:5010/docs"
+  },
+  "keywords": [
+    "API",
+    "Auth"
+  ],
+  "author": "Diyor Rakhimov",
+  "email": "mr.rakhimov@mail.com",
+  "license": "ISC",
+  "dependencies": {
+    "@fastify/cookie": "^9.3.1",
+    "@fastify/cors": "^9.0.1",
+    "@fastify/jwt": "^8.0.0",
+    "@fastify/redis": "^6.1.1",
+    "@fastify/swagger": "^8.14.0",
+    "@fastify/swagger-ui": "^3.0.0",
+    "bcrypt": "^5.1.1",
+    "dotenv": "^16.4.5",
+    "fastify": "^4.26.1",
+    "fastify-plugin": "^4.5.1",
+    "hybrid-crypto-js": "^0.2.4",
+    "ioredis": "^5.3.2",
+    "mongoose": "^8.1.3",
+    "pino-pretty": "^10.3.1"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
+    "@types/mongoose": "^5.11.97",
+    "@types/node": "^20.11.19",
+    "@types/pino": "^7.0.5",
+    "nodemon": "^3.0.3",
+    "typescript": "^5.3.3"
+  }
+}
