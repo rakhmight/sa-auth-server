@@ -4,7 +4,7 @@ declare interface UserI{
     bio: UserBio,
     system: UserSystem,
     status: UserStatus,
-    roleProperties: StudentRoleProperties | StaffRoleProperties,
+    roleProperties: StudentRoleProperties & StaffRoleProperties,
 }
 
 declare interface UserIDoc extends UserI, DocumentExC{

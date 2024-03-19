@@ -13,8 +13,7 @@ const userAuthData = {
             minLength: 4,
             maxLength: 24,
         }
-    },
-    required: ['password', 'login']
+    }
 }
 const userBioData = {
     type: 'object',
@@ -73,8 +72,7 @@ const userBioData = {
             maxLength: 9,
             minLength: 9,
         }
-    },
-    required: ['fullName', 'lastName', 'patronymic', 'phoneNumbers', 'dateOfBirth', 'geo', 'PINFL', 'passport']
+    }
 }
 const userSystemData = {
     type: 'object',
@@ -92,22 +90,24 @@ const userSystemData = {
             minItems: 1,
             uniqueItems: true
         }
-    },
-    required: ['role', 'permissions']
+    }
 }
 const userRolePropertiesData = {
     type: 'object',
     properties: {
         formation:{
+            description: 'role: employee & teacher',
             type: 'string',
             format: 'uuid',
             pattern: '^[0-9a-fA-F]{24}$'
         },
         position: {
+            description: 'role: employee & teacher',
             type: 'number',
             minimum: 1
         },
         postgraduateEducation: {
+            description: 'role: employee & teacher',
             type: 'object',
             properties: {
                 status: {
@@ -121,6 +121,7 @@ const userRolePropertiesData = {
             required: ['status' , 'startDate']
         },
         qualificationIncreasing: {
+            description: 'role: employee & teacher',
             type: 'object',
             properties: {
                 status: {
@@ -137,23 +138,28 @@ const userRolePropertiesData = {
         //////
 
         formOfEducation: {
+            description: 'role: enrollee & student',
             type: 'string',
             enum: ['full-time', 'in-absentia', 'magistracy', 'doctoral-studies']
         },
         dateOfAdmission: {
+            description: 'role: enrollee & student',
             type: 'string',
             format: 'date'
         },
         specialty: {
+            description: 'role: enrollee & student (not formOfEducation: doctoral-studies)',
             type: 'string',
             format: 'uuid',
             pattern: '^[0-9a-fA-F]{24}$'
         },
         group: {
+            description: 'role: enrollee & student (not formOfEducation: doctoral-studies)',
             type: 'number',
             minimum: 1
         },
         education: {
+            description: 'role: enrollee & student',
             type: 'string',
             enum: ['secondary', 'higher']
         }
@@ -175,9 +181,9 @@ const userStatusData = {
 const userData = {
     type: 'object',
     properties: {
-        auth: userAuthData,
-        bio: userBioData,
-        system: userSystemData,
+        auth: {...userAuthData, required: ['password', 'login']},
+        bio: {...userBioData, required: ['fullName', 'lastName', 'patronymic', 'phoneNumbers', 'dateOfBirth', 'geo', 'PINFL', 'passport']},
+        system: {...userSystemData, required: ['role', 'permissions']},
         roleProperties: userRolePropertiesData
     },
     required: ['auth', 'bio', 'system', 'roleProperties']
@@ -198,23 +204,31 @@ const reqBodyWithID = {
     required: ['data']
 }
 
-const resMatchedData = {
+const usersList = {
+    type: 'array',
+    items: {
+        type: 'string',
+        format: 'uuid'
+    },
+    minItems: 1,
+    uniqueItems: true
+}
+
+const reqBodyWithListOfID = {
+    description: 'Request body data',
     type: 'object',
     properties: {
-        OK: {
-            type: 'boolean',
-            default: true
-        },
-        params: {
+        data: {
             type: 'object',
             properties: {
-                matchedCount: {
-                    type: 'number',
-                }
-            }
+                users: usersList
+            },
+            required: ['users']
         }
-    }
+    },
+    required: ['data']
 }
+
 
 export const UserSignupSchema = {
     summary: 'Register a new user',
@@ -260,6 +274,64 @@ export const UserSignupSchema = {
         500: InternalServerError
     }
 }
+export const UsersSignupSchema = {
+    summary: 'Multi register users',
+    description: 'Register group of new users',
+    tags: ['User route'],
+    headers: HeadersSchema,
+    body: {
+        description: 'Request body data',
+        type: 'object',
+        properties: {
+            data: {
+                type: 'object',
+                properties: {
+                    users: {
+                        type: 'Array',
+                        items: userData,
+                        minItems: 1
+                    }
+                },
+                required: ['users']
+            }
+        },
+        required: ['data']
+    },
+    response: {
+        200: {
+          description: 'Successful response',
+          type: 'object',
+          properties: {
+            statusCode: { type: 'integer', default: 200 },
+            data: {
+                type: 'object',
+                properties: {
+                    users:{
+                        type: 'array',
+                        items: {
+                            type: 'object',
+                            properties: {
+                                id: userID,
+                                bio: userBioData,
+                                system: userSystemData,
+                                roleProperties: userRolePropertiesData,
+                                status: userStatusData
+                            }
+                        }
+                    }
+                }
+            }
+          }
+        },
+    
+        409: AlreadyExistError,
+        400: BadRequestError,
+        401: UnauthorizedError,
+        403: AccessDeniedError,
+        500: InternalServerError
+    } 
+}
+
 
 export const UserLoginSchema = {
     summary: 'Login',
@@ -270,7 +342,10 @@ export const UserLoginSchema = {
         description: 'Request parameters',
         type: 'object',
         properties: {
-            auth: userAuthData
+            auth: {
+                ...userAuthData,
+                required: ['password', 'login']
+            }
         },
         required: ['auth']
     },
@@ -309,7 +384,6 @@ export const UserLoginSchema = {
         500: InternalServerError
     }
 }
-
 export const UserLogoutSchema = {
     summary: 'Logout',
     description: 'Logout (exit from system)',
@@ -340,7 +414,6 @@ export const UserLogoutSchema = {
         500: InternalServerError
     }
 }
-
 export const UserRefreshSchema = {
     summary: 'Refresh',
     description: 'Refresh token',
@@ -371,6 +444,7 @@ export const UserRefreshSchema = {
     }
 }
 
+
 export const UserDeleteSchema = {
     summary: 'Delete',
     description: 'Delete user',
@@ -383,7 +457,222 @@ export const UserDeleteSchema = {
           type: 'object',
           properties: {
             statusCode: { type: 'integer', default: 200 },
-            data: resMatchedData
+            data: {
+                type: 'object',
+                properties: {
+                    OK: {
+                        type: 'boolean',
+                        default: true
+                    },
+                    params: {
+                        type: 'object',
+                        properties: {
+                            matchedCount: {
+                                type: 'number',
+                            }
+                        }
+                    }
+                }
+            }
+          }
+        },
+    
+        404: UserNotFoundError,
+        400: BadRequestError,
+        401: UnauthorizedError,
+        403: AccessDeniedError,
+        500: InternalServerError
+    }   
+}
+export const UsersDeleteSchema = {
+    summary: 'Multi delete',
+    description: 'Delete list of users',
+    tags: ['User route'],
+    headers: HeadersSchema,
+    body: reqBodyWithListOfID,
+    response: {
+        200: {
+          description: 'Successful response',
+          type: 'object',
+          properties: {
+            statusCode: { type: 'integer', default: 200 },
+            data: {
+                type: 'object',
+                properties: {
+                    OK: {
+                        type: 'boolean',
+                        default: true
+                    },
+                    params: {
+                        type: 'object',
+                        properties: {
+                            matchedCount: {
+                                type: 'number',
+                            }
+                        }
+                    }
+                }
+            }
+          }
+        },
+    
+        404: UserNotFoundError,
+        400: BadRequestError,
+        401: UnauthorizedError,
+        403: AccessDeniedError,
+        500: InternalServerError
+    }   
+}
+
+
+export const UserDestroySchema = {
+    summary: 'Destroy',
+    description: 'Destroy user',
+    tags: ['User route'],
+    headers: HeadersSchema,
+    body: reqBodyWithID,
+    response: {
+        200: {
+          description: 'Successful response',
+          type: 'object',
+          properties: {
+            statusCode: { type: 'integer', default: 200 },
+            data: {
+                type: 'object',
+                properties: {
+                    OK: {
+                        type: 'boolean',
+                        default: true
+                    },
+                    params: {
+                        type: 'object',
+                        properties: {
+                            matchedCount: {
+                                type: 'number',
+                            }
+                        }
+                    }
+                }
+            }
+          }
+        },
+    
+        404: UserNotFoundError,
+        400: BadRequestError,
+        401: UnauthorizedError,
+        403: AccessDeniedError,
+        500: InternalServerError
+    }   
+}
+export const UsersDestroySchema = {
+    summary: 'Multi destroy',
+    description: 'Destroy list of users',
+    tags: ['User route'],
+    headers: HeadersSchema,
+    body: reqBodyWithListOfID,
+    response: {
+        200: {
+          description: 'Successful response',
+          type: 'object',
+          properties: {
+            statusCode: { type: 'integer', default: 200 },
+            data: {
+                type: 'object',
+                properties: {
+                    OK: {
+                        type: 'boolean',
+                        default: true
+                    },
+                    params: {
+                        type: 'object',
+                        properties: {
+                            matchedCount: {
+                                type: 'number',
+                            }
+                        }
+                    }
+                }
+            }
+          }
+        },
+    
+        404: UserNotFoundError,
+        400: BadRequestError,
+        401: UnauthorizedError,
+        403: AccessDeniedError,
+        500: InternalServerError
+    }   
+}
+
+
+export const UserBlockSchema = {
+    summary: 'Block',
+    description: 'Block user',
+    tags: ['User route'],
+    headers: HeadersSchema,
+    body: reqBodyWithID,
+    response: {
+        200: {
+          description: 'Successful response',
+          type: 'object',
+          properties: {
+            statusCode: { type: 'integer', default: 200 },
+            data: {
+                type: 'object',
+                properties: {
+                    OK: {
+                        type: 'boolean',
+                        default: true
+                    },
+                    params: {
+                        type: 'object',
+                        properties: {
+                            matchedCount: {
+                                type: 'number',
+                            }
+                        }
+                    }
+                }
+            }
+          }
+        },
+    
+        404: UserNotFoundError,
+        400: BadRequestError,
+        401: UnauthorizedError,
+        403: AccessDeniedError,
+        500: InternalServerError
+    }   
+}
+export const UsersBlockSchema = {
+    summary: 'Multi block',
+    description: 'Block list of users',
+    tags: ['User route'],
+    headers: HeadersSchema,
+    body: reqBodyWithListOfID,
+    response: {
+        200: {
+          description: 'Successful response',
+          type: 'object',
+          properties: {
+            statusCode: { type: 'integer', default: 200 },
+            data: {
+                type: 'object',
+                properties: {
+                    OK: {
+                        type: 'boolean',
+                        default: true
+                    },
+                    params: {
+                        type: 'object',
+                        properties: {
+                            matchedCount: {
+                                type: 'number',
+                            }
+                        }
+                    }
+                }
+            }
           }
         },
     
@@ -396,9 +685,316 @@ export const UserDeleteSchema = {
 }
 
 export const EditUserSchema = {
+    summary: 'Edit user',
+    description: 'Edit user properties',
+    tags: ['User route'],
+    headers: HeadersSchema,
+    body: {
+        description: 'Request body data',
+        type: 'object',
+        properties: {
+            data: {
+                type: 'object',
+                properties: {
+                    user: {
+                        type: 'object',
+                        properties: {
+                            id: userID,
+
+                            auth: userAuthData,
+                            bio: userBioData,
+                            system: userSystemData,
+                            roleProperties: userRolePropertiesData
+                        },
+                        required: ['id']
+                    }
+                },
+                required: ['user']
+            }
+        },
+        required: ['data']
+    },
+    response: {
+        200: {
+          description: 'Successful response',
+          type: 'object',
+          properties: {
+            statusCode: { type: 'integer', default: 200 },
+            data: {
+                type: 'object',
+                properties: {
+                    OK: {
+                        type: 'boolean',
+                        default: true
+                    },
+                    params: {
+                        type: 'object',
+                        properties: {
+                            matchedCount: {
+                                type: 'number',
+                            }
+                        }
+                    }
+                }
+            }
+          }
+        },
     
+        400: BadRequestError,
+        401: UnauthorizedError,
+        403: AccessDeniedError,
+        500: InternalServerError
+    }
+}
+export const EditUsersSchema = {
+    summary: 'Edit users',
+    description: 'Edit list of users properties',
+    tags: ['User route'],
+    headers: HeadersSchema,
+    body: {
+        description: 'Request body data',
+        type: 'object',
+        properties: {
+            data: {
+                type: 'object',
+                properties: {
+                    users: usersList,
+                    properties: {
+                        type: 'object',
+                        properties: {
+                            system: {
+                                type: 'object',
+                                properties: {
+                                    role: {
+                                        type: 'string',
+                                        enum: ['student', 'enrollee', 'employee', 'teacher']
+                                    }
+                                }
+                            },
+                            roleProperties: {
+                                type: 'object',
+                                properties: {
+                                    formation:{
+                                        description: 'role: employee & teacher',
+                                        type: 'string',
+                                        format: 'uuid',
+                                        pattern: '^[0-9a-fA-F]{24}$'
+                                    },
+                                    position: {
+                                        description: 'role: employee & teacher',
+                                        type: 'number',
+                                        minimum: 1
+                                    },
+                            
+                                    //////
+                            
+                                    formOfEducation: {
+                                        description: 'role: enrollee & student',
+                                        type: 'string',
+                                        enum: ['full-time', 'in-absentia', 'magistracy', 'doctoral-studies']
+                                    },
+                                    dateOfAdmission: {
+                                        description: 'role: enrollee & student',
+                                        type: 'string',
+                                        format: 'date'
+                                    },
+                                    specialty: {
+                                        description: 'role: enrollee & student (not formOfEducation: doctoral-studies)',
+                                        type: 'string',
+                                        format: 'uuid',
+                                        pattern: '^[0-9a-fA-F]{24}$'
+                                    },
+                                    group: {
+                                        description: 'role: enrollee & student (not formOfEducation: doctoral-studies)',
+                                        type: 'number',
+                                        minimum: 1
+                                    },
+                                    education: {
+                                        description: 'role: enrollee & student',
+                                        type: 'string',
+                                        enum: ['secondary', 'higher']
+                                    }
+                                }
+                            }
+                        },
+                        required: ['id']
+                    }
+                },
+                required: ['user']
+            }
+        },
+        required: ['data']
+    },
+    response: {
+        200: {
+          description: 'Successful response',
+          type: 'object',
+          properties: {
+            statusCode: { type: 'integer', default: 200 },
+            data: {
+                type: 'object',
+                properties: {
+                    OK: {
+                        type: 'boolean',
+                        default: true
+                    },
+                    params: {
+                        type: 'object',
+                        properties: {
+                            matchedCount: {
+                                type: 'number',
+                            }
+                        }
+                    }
+                }
+            }
+          }
+        },
+    
+        400: BadRequestError,
+        401: UnauthorizedError,
+        403: AccessDeniedError,
+        500: InternalServerError
+    } 
 }
 
+
 export const GetAllUsersSchema = {
+    summary: 'Get full users list',
+    description: 'Get all users from DB',
+    tags: ['User route'],
+    headers: HeadersSchema,
+    response: {
+        200: {
+          description: 'Successful response',
+          type: 'object',
+          properties: {
+            statusCode: { type: 'integer', default: 200 },
+            data: {
+                type: 'object',
+                properties: {
+                    users: {
+                        type: 'array',
+                        items: {
+                            type: 'object',
+                            properties: {
+                                id: userID,
+                                bio: userBioData,
+                                system: userSystemData,
+                                roleProperties: userRolePropertiesData,
+                                status: userStatusData
+                            }
+                        }
+                    }
+                }
+            }
+          }
+        },
     
+        404: UserNotFoundError,
+        400: BadRequestError,
+        401: UnauthorizedError,
+        403: AccessDeniedError,
+        500: InternalServerError
+    }
+}
+export const GetUsersSchema = {
+    summary: 'Get custom users list',
+    description: 'Get users list from DB by ID from query param',
+    tags: ['User route'],
+    headers: HeadersSchema,
+    querystring: {
+        type: 'object',
+        properties: {
+            users: {
+                type: 'array',
+                items: {
+                    type: 'string',
+                    format: 'uuid'
+                },
+                minItems: 1,
+                uniqueItems: true
+            }
+        },
+        required: ['users']
+    },
+    response: {
+        200: {
+          description: 'Successful response',
+          type: 'object',
+          properties: {
+            statusCode: { type: 'integer', default: 200 },
+            data: {
+                type: 'object',
+                properties: {
+                    users: {
+                        type: 'array',
+                        items: {
+                            type: 'object',
+                            properties: {
+                                id: userID,
+                                bio: userBioData,
+                                system: userSystemData,
+                                roleProperties: userRolePropertiesData,
+                                status: userStatusData
+                            }
+                        }
+                    }
+                }
+            }
+          }
+        },
+    
+        404: UserNotFoundError,
+        400: BadRequestError,
+        401: UnauthorizedError,
+        403: AccessDeniedError,
+        500: InternalServerError
+    }
+}
+export const GetUserSchema = {
+    summary: 'Get user data',
+    description: 'Get user data from DB by ID from query param',
+    tags: ['User route'],
+    headers: HeadersSchema,
+    querystring: {
+        type: 'object',
+        properties: {
+            id: {
+                type: 'string',
+                format: 'uuid'
+            }
+        },
+        required: ['id']
+    },
+    response: {
+        200: {
+          description: 'Successful response',
+          type: 'object',
+          properties: {
+            statusCode: { type: 'integer', default: 200 },
+            data: {
+                type: 'object',
+                properties: {
+                    user: {
+                        type: 'object',
+                        properties: {
+                            id: userID,
+                            bio: userBioData,
+                            system: userSystemData,
+                            roleProperties: userRolePropertiesData,
+                            status: userStatusData
+                        }
+                    }
+                }
+            }
+          }
+        },
+    
+        404: UserNotFoundError,
+        400: BadRequestError,
+        401: UnauthorizedError,
+        403: AccessDeniedError,
+        500: InternalServerError
+    }
 }

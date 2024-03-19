@@ -14,7 +14,9 @@ declare interface FormationIDoc extends FormationI, DocumentExC{
 declare interface FormationModelI extends ModelExC<FormationIDoc> {
 }
 
+declare type FormationPositionID = number
+
 declare interface FormationPosition {
-    id: number,
+    id: FormationPositionID,
     name: Array<InternationalNameValue>
 }

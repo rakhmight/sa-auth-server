@@ -18,6 +18,10 @@ declare interface RouteWithData<T> extends SimpleReqData {
     Body: T
 }
 
+declare interface GetReqWithQueryParams<T> extends AuthReqData {
+    Querystring: T
+}
+
 declare interface ReqData<T> {
     data: T
 }
