@@ -5,7 +5,8 @@ declare interface FormationI{
     positions: Array<FormationPosition>,
     ref?: import('mongoose').Schema.Types.ObjectId,
     generation?: number,
-    child?: number
+    child?: number,
+    counter: number
 }
 
 declare interface FormationIDoc extends FormationI, DocumentExC{

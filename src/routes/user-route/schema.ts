@@ -727,12 +727,14 @@ export const EditUserSchema = {
                         type: 'boolean',
                         default: true
                     },
-                    params: {
+                    user: {
                         type: 'object',
                         properties: {
-                            matchedCount: {
-                                type: 'number',
-                            }
+                            id: userID,
+                            bio: userBioData,
+                            system: userSystemData,
+                            roleProperties: userRolePropertiesData,
+                            status: userStatusData
                         }
                     }
                 }

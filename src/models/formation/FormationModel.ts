@@ -55,6 +55,9 @@ const schema: Schema = new Schema<FormationI>(
         },
         child: {
             type: Number
+        },
+        counter: {
+            type: Number
         }
     },
     { 

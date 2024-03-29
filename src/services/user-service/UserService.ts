@@ -47,12 +47,10 @@ export async function login(loginData:UserLogin, jwt:JWT, redis:FastifyRedis){
 
     return preparedUserData
 }
-
 export async function logout(userID:Schema.Types.ObjectId, redis:FastifyRedis) {
     const token = await removeToken(userID, redis)
     return token
 }
-
 export async function refresh(refreshToken:string, userID:Schema.Types.ObjectId, jwt:JWT, redis:FastifyRedis) {
     const user = await UserModel.findById(userID)
     if(!user) throw Error('user-not-found')
@@ -146,70 +144,65 @@ export async function editUser(user: EditableUserProperties){
 
     if(!userCandidate) throw Error('user-not-found')
 
-    const userTmp:Omit<EditableUserProperties, 'id'> = {}
+    // const userTmp2 = structuredClone(userCandidate)
+
+    const userUpdProps:Partial<UpdatableUserProperties> = {}
 
     if(user.auth){
-        userTmp.auth = {}
-        if(user.auth.login) userTmp.auth.login = user.auth.login
-        if(user.auth.password) userTmp.auth.password = user.auth.password
+        if(user.auth.login) userUpdProps['auth.login'] = user.auth.login
+        if(user.auth.password) userUpdProps['auth.password'] = user.auth.password
     }
     if(user.bio){
-        userTmp.bio = {}
-        if(user.bio.PINFL) userTmp.bio.PINFL = user.bio.PINFL
-        if(user.bio.passport) userTmp.bio.passport = user.bio.passport
-        if(user.bio.dateOfBirth) userTmp.bio.dateOfBirth = user.bio.dateOfBirth
-        if(user.bio.firstName) userTmp.bio.firstName = user.bio.firstName
-        if(user.bio.lastName) userTmp.bio.lastName = user.bio.lastName
-        if(user.bio.patronymic) userTmp.bio.patronymic = user.bio.patronymic
+        if(user.bio.PINFL) userUpdProps['bio.PINFL'] = user.bio.PINFL
+        if(user.bio.passport) userUpdProps['bio.passport'] = user.bio.passport
+        if(user.bio.dateOfBirth) userUpdProps['bio.dateOfBirth'] = user.bio.dateOfBirth as Date
+        if(user.bio.firstName) userUpdProps['bio.firstName'] = user.bio.firstName
+        if(user.bio.lastName) userUpdProps['bio.lastName'] = user.bio.lastName
+        if(user.bio.patronymic) userUpdProps['bio.patronymic'] = user.bio.patronymic
         if(user.bio.geo){
-            userTmp.bio.geo = {}
-            if(user.bio.geo.countryISO) userTmp.bio.geo.countryISO = user.bio.geo.countryISO
-            if(user.bio.geo.region) userTmp.bio.geo.region = user.bio.geo.region
+            if(user.bio.geo.countryISO) userUpdProps['bio.geo.countryISO'] = user.bio.geo.countryISO
+            if(user.bio.geo.region) userUpdProps['bio.geo.region'] = user.bio.geo.region
         }
     }
     if(user.system){
-        userTmp.system = {}
-        if(user.system.role) userTmp.system.role = user.system.role
-        if(user.system.permissions) userTmp.system.permissions = user.system.permissions
+        if(user.system.role) userUpdProps['system.role'] = user.system.role
+        if(user.system.permissions) userUpdProps['system.permissions'] = user.system.permissions
     }
     if(user.roleProperties){
-        userTmp.roleProperties = {}
-        if(user.roleProperties.formation) userTmp.roleProperties.formation = user.roleProperties.formation
-        if(user.roleProperties.position) userTmp.roleProperties.position = user.roleProperties.position
+        if(user.roleProperties.formation) userUpdProps['roleProperties.formation'] = user.roleProperties.formation as Schema.Types.ObjectId
+        if(user.roleProperties.position) userUpdProps['roleProperties.position'] = user.roleProperties.position
         if(user.roleProperties.postgraduateEducation) {
-            userTmp.roleProperties.postgraduateEducation = {}
-            if(user.roleProperties.postgraduateEducation.date) userTmp.roleProperties.postgraduateEducation.date = user.roleProperties.postgraduateEducation.date
-            if(user.roleProperties.postgraduateEducation.isActive || user.roleProperties.postgraduateEducation.isActive === false) userTmp.roleProperties.postgraduateEducation.isActive = user.roleProperties.postgraduateEducation.isActive
+            if(user.roleProperties.postgraduateEducation.date) userUpdProps['roleProperties.postgraduateEducation.date'] = user.roleProperties.postgraduateEducation.date as Date
+            if(user.roleProperties.postgraduateEducation.isActive || user.roleProperties.postgraduateEducation.isActive === false) userUpdProps['roleProperties.postgraduateEducation.isActive'] = user.roleProperties.postgraduateEducation.isActive
         }
         if(user.roleProperties.qualificationIncreasing) {
-            userTmp.roleProperties.qualificationIncreasing = {}
-            if(user.roleProperties.qualificationIncreasing.date) userTmp.roleProperties.qualificationIncreasing.date = user.roleProperties.qualificationIncreasing.date
-            if(user.roleProperties.qualificationIncreasing.isActive || user.roleProperties.qualificationIncreasing.isActive === false) userTmp.roleProperties.qualificationIncreasing.isActive = user.roleProperties.qualificationIncreasing.isActive
+            if(user.roleProperties.qualificationIncreasing.date) userUpdProps['roleProperties.qualificationIncreasing.date'] = user.roleProperties.qualificationIncreasing.date as Date
+            if(user.roleProperties.qualificationIncreasing.isActive || user.roleProperties.qualificationIncreasing.isActive === false)  userUpdProps['roleProperties.qualificationIncreasing.isActive'] = user.roleProperties.qualificationIncreasing.isActive
         }
 
-        if(user.roleProperties.dateOfAdmission) userTmp.roleProperties.dateOfAdmission = user.roleProperties.dateOfAdmission
-        if(user.roleProperties.education) userTmp.roleProperties.education = user.roleProperties.education
-        if(user.roleProperties.formOfEducation) userTmp.roleProperties.formOfEducation = user.roleProperties.formOfEducation
-        if(user.roleProperties.specialty) userTmp.roleProperties.specialty = user.roleProperties.specialty
-        if(user.roleProperties.group) userTmp.roleProperties.group = user.roleProperties.group
+        if(user.roleProperties.dateOfAdmission) userUpdProps['roleProperties.dateOfAdmission'] = user.roleProperties.dateOfAdmission as Date
+        if(user.roleProperties.education) userUpdProps['roleProperties.education'] = user.roleProperties.education
+        if(user.roleProperties.formOfEducation) userUpdProps['roleProperties.formOfEducation'] = user.roleProperties.formOfEducation
+        if(user.roleProperties.specialty) userUpdProps['roleProperties.specialty'] = user.roleProperties.specialty as Schema.Types.ObjectId
+        if(user.roleProperties.group) userUpdProps['roleProperties.group'] = user.roleProperties.group
     }
 
     // uncorrected req 
-    if(userTmp.system){
-        if(userTmp.system.role){
+    if(user.system){
+        if(user.system.role){
 
-            if(userTmp.system.role === UserRoles.Employee || userTmp.system.role === UserRoles.Teacher){
-                if(userTmp.roleProperties){
-                    if(userTmp.roleProperties.dateOfAdmission || userTmp.roleProperties.group || userTmp.roleProperties.specialty || userTmp.roleProperties.education || userTmp.roleProperties.formOfEducation) throw Error('bad-req')
+            if(user.system.role === UserRoles.Employee || user.system.role === UserRoles.Teacher){
+                if(user.roleProperties){
+                    if(user.roleProperties.dateOfAdmission || user.roleProperties.group || user.roleProperties.specialty || user.roleProperties.education || user.roleProperties.formOfEducation) throw Error('bad-req')
 
-                    if(userTmp.system.role !== userCandidate.system.role){
-                        if(!userTmp.roleProperties.position || !userTmp.roleProperties.formation) throw Error('bad-req')
+                    if(user.system.role !== userCandidate.system.role){
+                        if(!user.roleProperties.position || !user.roleProperties.formation) throw Error('bad-req')
 
-                        if(!userCandidate.roleProperties.postgraduateEducation) userTmp.roleProperties.postgraduateEducation = {
+                        if(!userCandidate.roleProperties.postgraduateEducation) user.roleProperties.postgraduateEducation = {
                             date: null,
                             isActive: false
                         }
-                        if(!userCandidate.roleProperties.qualificationIncreasing) userTmp.roleProperties.qualificationIncreasing = {
+                        if(!userCandidate.roleProperties.qualificationIncreasing) user.roleProperties.qualificationIncreasing = {
                             date: null,
                             isActive: false
                         }
@@ -217,18 +210,18 @@ export async function editUser(user: EditableUserProperties){
                 }
             }
 
-            if(userTmp.system.role === UserRoles.Enrollee || userTmp.system.role === UserRoles.Student){
-                if(userTmp.roleProperties){
-                    if(userTmp.roleProperties.position || userTmp.roleProperties.formation || userTmp.roleProperties.postgraduateEducation || userTmp.roleProperties.qualificationIncreasing) throw Error('bad-req')
+            if(user.system.role === UserRoles.Enrollee || user.system.role === UserRoles.Student){
+                if(user.roleProperties){
+                    if(user.roleProperties.position || user.roleProperties.formation || user.roleProperties.postgraduateEducation || user.roleProperties.qualificationIncreasing) throw Error('bad-req')
     
-                    if(userTmp.roleProperties.formOfEducation === StudentEducationForms.DoctoralStudies){
-                        if(userTmp.roleProperties.group || userTmp.roleProperties.specialty) throw Error('bad-req')
+                    if(user.roleProperties.formOfEducation === StudentEducationForms.DoctoralStudies){
+                        if(user.roleProperties.group || user.roleProperties.specialty) throw Error('bad-req')
                     }
 
-                    if(userTmp.system.role !== userCandidate.system.role){
-                        if(!userTmp.roleProperties.dateOfAdmission || !userTmp.roleProperties.education || !userTmp.roleProperties.formOfEducation) throw Error('bad-req')
-                        if(userTmp.roleProperties.formOfEducation !== StudentEducationForms.DoctoralStudies){
-                            if(!userTmp.roleProperties.group || !userTmp.roleProperties.specialty) throw Error('bad-req')
+                    if(user.system.role !== userCandidate.system.role){
+                        if(!user.roleProperties.dateOfAdmission || !user.roleProperties.education || !user.roleProperties.formOfEducation) throw Error('bad-req')
+                        if(user.roleProperties.formOfEducation !== StudentEducationForms.DoctoralStudies){
+                            if(!user.roleProperties.group || !user.roleProperties.specialty) throw Error('bad-req')
                         }
 
                     }
@@ -236,36 +229,37 @@ export async function editUser(user: EditableUserProperties){
             }
 
         } else {
-            if(userTmp.roleProperties){
-                if(userCandidate.roleProperties.formOfEducation === StudentEducationForms.DoctoralStudies && userTmp.roleProperties.group || userCandidate.roleProperties.formOfEducation === StudentEducationForms.DoctoralStudies && userTmp.roleProperties.specialty) throw Error('bad-req')
+            if(user.roleProperties){
+                if(userCandidate.roleProperties.formOfEducation === StudentEducationForms.DoctoralStudies && user.roleProperties.group || userCandidate.roleProperties.formOfEducation === StudentEducationForms.DoctoralStudies && user.roleProperties.specialty) throw Error('bad-req')
             }
         }
     }else {
-        if(userTmp.roleProperties){
-            if(userCandidate.roleProperties.formOfEducation === StudentEducationForms.DoctoralStudies && userTmp.roleProperties.group || userCandidate.roleProperties.formOfEducation === StudentEducationForms.DoctoralStudies && userTmp.roleProperties.specialty) throw Error('bad-req')
+        if(user.roleProperties){
+            if(userCandidate.roleProperties.formOfEducation === StudentEducationForms.DoctoralStudies && user.roleProperties.group || userCandidate.roleProperties.formOfEducation === StudentEducationForms.DoctoralStudies && user.roleProperties.specialty) throw Error('bad-req')
         }
     }
 
-    const userData = await UserModel.updateOne({ _id: user.id }, {
-        ...userTmp
-    })
+    const userData = await UserModel.findOneAndUpdate({ _id: user.id }, {
+        ...userUpdProps
+    },
+    { new: true })
 
-    return userData
+    if(!userData) throw Error('user-not-found')
+    const preparedUserData = prepareUserData(userData)
+
+    return preparedUserData
 }
 export async function editUsers(users: Array<Schema.Types.ObjectId>, properties: EditableUsersProperties){
 
     // TODO: validation
-    const allowedProperties:EditableUsersProperties = {}
+    const userUpdProps:Partial<UpdatableUsersProperties> = {}
 
     if(properties.system){
-        allowedProperties.system = {}
         if(properties.system.role && !properties.roleProperties) throw Error('bad-req')
-        if(properties.system.role) allowedProperties.system.role = properties.system.role
+        if(properties.system.role) userUpdProps['system.role'] = properties.system.role
     }
 
     if(properties.roleProperties){
-        allowedProperties.roleProperties = {}
-
         if(properties.system){
             if(properties.system.role){
                 if(properties.system.role === UserRoles.Employee || properties.system.role === UserRoles.Teacher){
@@ -289,19 +283,19 @@ export async function editUsers(users: Array<Schema.Types.ObjectId>, properties:
             if(properties.roleProperties.dateOfAdmission || properties.roleProperties.education || properties.roleProperties.formOfEducation || properties.roleProperties.group || properties.roleProperties.specialty) throw Error('bad-req')
         }
 
-        if(properties.roleProperties.dateOfAdmission) allowedProperties.roleProperties.dateOfAdmission = properties.roleProperties.dateOfAdmission
-        if(properties.roleProperties.education) allowedProperties.roleProperties.education = properties.roleProperties.education
-        if(properties.roleProperties.formOfEducation) allowedProperties.roleProperties.formOfEducation = properties.roleProperties.formOfEducation
-        if(properties.roleProperties.group) allowedProperties.roleProperties.group = properties.roleProperties.group
-        if(properties.roleProperties.specialty) allowedProperties.roleProperties.specialty = properties.roleProperties.specialty
+        if(properties.roleProperties.dateOfAdmission) userUpdProps['roleProperties.dateOfAdmission'] = properties.roleProperties.dateOfAdmission as Date
+        if(properties.roleProperties.education) userUpdProps['roleProperties.education'] = properties.roleProperties.education
+        if(properties.roleProperties.formOfEducation) userUpdProps['roleProperties.formOfEducation'] = properties.roleProperties.formOfEducation
+        if(properties.roleProperties.group) userUpdProps['roleProperties.group'] = properties.roleProperties.group
+        if(properties.roleProperties.specialty) userUpdProps['roleProperties.specialty'] = properties.roleProperties.specialty as Schema.Types.ObjectId
 
-        if(properties.roleProperties.formation) allowedProperties.roleProperties.formation = properties.roleProperties.formation
-        if(properties.roleProperties.position) allowedProperties.roleProperties.position = properties.roleProperties.position
+        if(properties.roleProperties.formation) userUpdProps['roleProperties.formation'] = properties.roleProperties.formation as Schema.Types.ObjectId
+        if(properties.roleProperties.position) userUpdProps['roleProperties.position'] = properties.roleProperties.position
     }
 
     const usersData = await UserModel.updateMany(
         { _id: { $in: users } },
-        { $set: { ...allowedProperties } }
+        { $set: { ...userUpdProps } }
     )
 
     return usersData

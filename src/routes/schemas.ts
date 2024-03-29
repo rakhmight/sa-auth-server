@@ -44,6 +44,21 @@ export const InternalServerError = {
   },
 };
 
+export const NotFoundError = {
+  description: "Resource not found",
+  type: "object",
+  properties: {
+    statusCode: {
+      type: "integer",
+      default: 404
+    },
+    message: {
+      type: "string",
+      default: "Not found"
+    },
+  },
+}
+
 // Header
 export const HeadersSchema = {
   type: "object",

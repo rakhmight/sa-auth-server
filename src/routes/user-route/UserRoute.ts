@@ -37,7 +37,7 @@ const UserRoutes: FastifyPluginAsync = async (fastify: FastifyInstance, options:
             const users = req.body.data.users
             const usersData = await registrationUsers(users)
 
-            if(usersData && usersData.length){
+            if(usersData){
                 //TODO: notify other systems
 
                 req.log.info(`[SA-Auth] Signup group of new users, ID: ${usersData.map(u => u.id).join(', ')}`);
@@ -119,6 +119,7 @@ const UserRoutes: FastifyPluginAsync = async (fastify: FastifyInstance, options:
 
             if(userData){
                 //TODO: notify other systems
+                // delete tokens
 
                 req.log.info(`[SA-Auth] Delete user, ID: ${userID}`);
                 return rep.code(200).send({statusCode: 200, data: { OK: true, params: userData } })
@@ -137,6 +138,7 @@ const UserRoutes: FastifyPluginAsync = async (fastify: FastifyInstance, options:
 
             if(usersData){
                 //TODO: notify other systems
+                // delete tokens
 
                 req.log.info(`[SA-Auth] Delete users, ID: ${usersID.join(', ')}`);
                 return rep.code(200).send({statusCode: 200, data: { OK: true, params: usersData } })
@@ -155,6 +157,7 @@ const UserRoutes: FastifyPluginAsync = async (fastify: FastifyInstance, options:
 
             if(userData){
                 // TODO: notify other systems
+                // delete tokens
 
                 req.log.info(`[SA-Auth] Destroy user data, ID: ${userID}`);
                 return rep.code(200).send({statusCode: 200, data: { OK: true, params: userData } })
@@ -173,6 +176,7 @@ const UserRoutes: FastifyPluginAsync = async (fastify: FastifyInstance, options:
 
             if(usersData){
                 //TODO: notify other systems
+                // delete tokens
 
                 req.log.info(`[SA-Auth] Destroy users data, ID: ${usersID.join(', ')}`);
                 return rep.code(200).send({statusCode: 200, data: { OK: true, params: usersData } })
@@ -191,6 +195,7 @@ const UserRoutes: FastifyPluginAsync = async (fastify: FastifyInstance, options:
 
             if(userData){
                 // TODO: notify other systems
+                // delete tokens
 
                 req.log.info(`[SA-Auth] Block user, ID: ${userID}`);
                 return rep.code(200).send({statusCode: 200, data: { OK: true, params: userData } })
@@ -209,6 +214,7 @@ const UserRoutes: FastifyPluginAsync = async (fastify: FastifyInstance, options:
 
             if(usersData){
                 //TODO: notify other systems
+                // delete tokens
 
                 req.log.info(`[SA-Auth] Block users, ID: ${usersID.join(', ')}`);
                 return rep.code(200).send({statusCode: 200, data: { OK: true, params: usersData } })
@@ -230,7 +236,7 @@ const UserRoutes: FastifyPluginAsync = async (fastify: FastifyInstance, options:
                 //TODO: notify other systems
 
                 req.log.info(`[SA-Auth] Edit user properties, ID: ${user.id}`)
-                return rep.code(200).send({statusCode: 200, data: { OK: true, params: userData } })
+                return rep.code(200).send({statusCode: 200, data: { OK: true, user: userData } })
             }
         } catch (error) {
             return APIError(error as Error, rep, req)
