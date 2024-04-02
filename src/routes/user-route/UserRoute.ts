@@ -22,7 +22,7 @@ const UserRoutes: FastifyPluginAsync = async (fastify: FastifyInstance, options:
             if(userData){
                 //TODO: notify other systems
 
-                req.log.info(`[SA-Auth] Signup new user, ID: ${userData.id}`);
+                req.log.info({ actor: 'Route: user' }, `Signup new user, ID: ${userData.id}`)
                 return rep.code(200).send({statusCode: 200, data: { user: userData } })
             }
 
@@ -40,7 +40,7 @@ const UserRoutes: FastifyPluginAsync = async (fastify: FastifyInstance, options:
             if(usersData){
                 //TODO: notify other systems
 
-                req.log.info(`[SA-Auth] Signup group of new users, ID: ${usersData.map(u => u.id).join(', ')}`);
+                req.log.info({ actor: 'Route: user' }, `Signup group of new users, ID: ${usersData.map(u => u.id).join(', ')}`)
                 return rep.code(200).send({statusCode: 200, data: { users: usersData } })
             }
 
@@ -60,7 +60,7 @@ const UserRoutes: FastifyPluginAsync = async (fastify: FastifyInstance, options:
             if(userData) {
                 // TODO: notify other systems (auth service)
 
-                req.log.info(`[SA-Messenger] User login, ID: ${userData.user.id}`);
+                req.log.info({ actor: 'Route: user' }, `User login, ID: ${userData.user.id}`)
                 rep.cookie('refreshToken', userData.refreshToken, { maxAge: 5*24*60*60*1000, httpOnly: true , path: '/'})
                 return rep.code(200).send({statusCode: 200, data: userData })
             }
@@ -80,7 +80,7 @@ const UserRoutes: FastifyPluginAsync = async (fastify: FastifyInstance, options:
             if(token){
                 // TODO: notify other systems (auth service)
 
-                req.log.info(`[SA-Messenger] User logout, ID: ${userID}`);
+                req.log.info({ actor: 'Route: user' }, `User logout, ID: ${userID}`);
                 rep.clearCookie('refreshToken', { path: '/' })
                 return rep.code(200).send({ statusCode: 200, data: { token } })
             }
@@ -101,6 +101,7 @@ const UserRoutes: FastifyPluginAsync = async (fastify: FastifyInstance, options:
             if(userData){
                 // TODO: notify other systems (auth service)
 
+                req.log.info({ actor: 'Route: user' }, `Refresh tokens, ID: ${userID}`);
                 rep.cookie('refreshToken', userData.refreshToken, { maxAge: 30*24*60*60*1000, httpOnly: true , path: '/'})
                 return rep.code(200).send({statusCode: 200, data: userData })
             }
@@ -121,7 +122,7 @@ const UserRoutes: FastifyPluginAsync = async (fastify: FastifyInstance, options:
                 //TODO: notify other systems
                 // delete tokens
 
-                req.log.info(`[SA-Auth] Delete user, ID: ${userID}`);
+                req.log.info({ actor: 'Route: user' }, `Delete user, ID: ${userID}`);
                 return rep.code(200).send({statusCode: 200, data: { OK: true, params: userData } })
             }
 
@@ -140,7 +141,7 @@ const UserRoutes: FastifyPluginAsync = async (fastify: FastifyInstance, options:
                 //TODO: notify other systems
                 // delete tokens
 
-                req.log.info(`[SA-Auth] Delete users, ID: ${usersID.join(', ')}`);
+                req.log.info({ actor: 'Route: user' }, `Delete users, ID: ${usersID.join(', ')}`);
                 return rep.code(200).send({statusCode: 200, data: { OK: true, params: usersData } })
             }
 
@@ -159,7 +160,7 @@ const UserRoutes: FastifyPluginAsync = async (fastify: FastifyInstance, options:
                 // TODO: notify other systems
                 // delete tokens
 
-                req.log.info(`[SA-Auth] Destroy user data, ID: ${userID}`);
+                req.log.info({ actor: 'Route: user' }, `Destroy user data, ID: ${userID}`);
                 return rep.code(200).send({statusCode: 200, data: { OK: true, params: userData } })
             }
 
@@ -178,7 +179,7 @@ const UserRoutes: FastifyPluginAsync = async (fastify: FastifyInstance, options:
                 //TODO: notify other systems
                 // delete tokens
 
-                req.log.info(`[SA-Auth] Destroy users data, ID: ${usersID.join(', ')}`);
+                req.log.info({ actor: 'Route: user' }, `Destroy users data, ID: ${usersID.join(', ')}`);
                 return rep.code(200).send({statusCode: 200, data: { OK: true, params: usersData } })
             }
 
@@ -197,7 +198,7 @@ const UserRoutes: FastifyPluginAsync = async (fastify: FastifyInstance, options:
                 // TODO: notify other systems
                 // delete tokens
 
-                req.log.info(`[SA-Auth] Block user, ID: ${userID}`);
+                req.log.info({ actor: 'Route: user' }, `Block user, ID: ${userID}`);
                 return rep.code(200).send({statusCode: 200, data: { OK: true, params: userData } })
             }
 
@@ -216,7 +217,7 @@ const UserRoutes: FastifyPluginAsync = async (fastify: FastifyInstance, options:
                 //TODO: notify other systems
                 // delete tokens
 
-                req.log.info(`[SA-Auth] Block users, ID: ${usersID.join(', ')}`);
+                req.log.info({ actor: 'Route: user' }, `Block users, ID: ${usersID.join(', ')}`);
                 return rep.code(200).send({statusCode: 200, data: { OK: true, params: usersData } })
             }
 
@@ -235,7 +236,7 @@ const UserRoutes: FastifyPluginAsync = async (fastify: FastifyInstance, options:
             if(userData){
                 //TODO: notify other systems
 
-                req.log.info(`[SA-Auth] Edit user properties, ID: ${user.id}`)
+                req.log.info({ actor: 'Route: user' }, `Edit user properties, ID: ${user.id}`)
                 return rep.code(200).send({statusCode: 200, data: { OK: true, user: userData } })
             }
         } catch (error) {
@@ -252,7 +253,7 @@ const UserRoutes: FastifyPluginAsync = async (fastify: FastifyInstance, options:
             if(usersData){
                 //TODO: notify other systems
 
-                req.log.info(`[SA-Auth] Edit users properties, ID: ${users.join(', ')}`);
+                req.log.info({ actor: 'Route: user' }, `Edit users properties, ID: ${users.join(', ')}`);
                 return rep.code(200).send({statusCode: 200, data: { OK: true, params: usersData } })
             }
         } catch (error) {

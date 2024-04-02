@@ -18,7 +18,8 @@ const connectMongoDB: FastifyPluginAsync<MyPluginOptions> = async (
             autoIndex: false
         })
     } catch (error) {
-        console.error(error)
+        fastify.log.fatal({ actor: 'MongoDB' }, (error as Error).message)
+        process.exit(1)
     }
 };
 

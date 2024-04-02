@@ -17,15 +17,15 @@ export const app = build(fastifyConfig);
         
         await app.listen({port: process.env.SERVER_PORT, host: getHostAddress() ? getHostAddress() : hostError()})
         .then(()=>{            
-            app.log.info('[SA-Auth] Server started successfully');
+            app.log.info({ actor: 'SA-Auth' }, 'Server started successfully');
         })
     } catch (err) {
-        app.log.error(err);
-        process.exit(1);
+        app.log.fatal({ actor: 'SA-Auth' }, err)
+        process.exit(1)
     }
 })()
 
 function hostError(){
-    app.log.error('Unable to get ip address of host');
-    process.exit(1);
+    app.log.fatal({ actor: 'SA-Auth' }, 'Unable to get ip address of host')
+    process.exit(1)
 }

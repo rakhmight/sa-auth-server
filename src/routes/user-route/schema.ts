@@ -1,4 +1,4 @@
-import { AlreadyExistError, BadRequestError, AccessDeniedError, InternalServerError, HeadersSchema, UserNotFoundError, UnauthorizedError, WithoutAuthHeaderSchema, RefreshTokenCookieSchema } from "../schemas"
+import { AlreadyExistError, BadRequestError, AccessDeniedError, InternalServerError, HeadersSchema, UserNotFoundError, UnauthorizedError, WithoutAuthHeaderSchema, RefreshTokenCookieSchema, IDProp } from "../schemas"
 
 const userAuthData = {
     type: 'object',
@@ -165,11 +165,6 @@ const userRolePropertiesData = {
         }
     }
 }
-const userID = {
-    type: 'string',
-    format: 'uuid',
-    pattern: '^[0-9a-fA-F]{24}$'
-}
 const userStatusData = {
     type: 'object',
     properties: {
@@ -196,7 +191,7 @@ const reqBodyWithID = {
         data: {
             type: 'object',
             properties: {
-                id: userID
+                id: IDProp
             },
             required: ['id']
         }
@@ -206,10 +201,7 @@ const reqBodyWithID = {
 
 const usersList = {
     type: 'array',
-    items: {
-        type: 'string',
-        format: 'uuid'
-    },
+    items: IDProp,
     minItems: 1,
     uniqueItems: true
 }
@@ -255,7 +247,7 @@ export const UserSignupSchema = {
                     user:{
                         type: 'object',
                         properties: {
-                            id: userID,
+                            id: IDProp,
                             bio: userBioData,
                             system: userSystemData,
                             roleProperties: userRolePropertiesData,
@@ -311,7 +303,7 @@ export const UsersSignupSchema = {
                         items: {
                             type: 'object',
                             properties: {
-                                id: userID,
+                                id: IDProp,
                                 bio: userBioData,
                                 system: userSystemData,
                                 roleProperties: userRolePropertiesData,
@@ -361,7 +353,7 @@ export const UserLoginSchema = {
                     user: {
                         type: 'object',
                         properties: {
-                            id: userID,
+                            id: IDProp,
                             bio: userBioData,
                             system: userSystemData,
                             roleProperties: userRolePropertiesData,
@@ -699,7 +691,7 @@ export const EditUserSchema = {
                     user: {
                         type: 'object',
                         properties: {
-                            id: userID,
+                            id: IDProp,
 
                             auth: userAuthData,
                             bio: userBioData,
@@ -730,7 +722,7 @@ export const EditUserSchema = {
                     user: {
                         type: 'object',
                         properties: {
-                            id: userID,
+                            id: IDProp,
                             bio: userBioData,
                             system: userSystemData,
                             roleProperties: userRolePropertiesData,
@@ -880,7 +872,7 @@ export const GetAllUsersSchema = {
                         items: {
                             type: 'object',
                             properties: {
-                                id: userID,
+                                id: IDProp,
                                 bio: userBioData,
                                 system: userSystemData,
                                 roleProperties: userRolePropertiesData,
@@ -934,7 +926,7 @@ export const GetUsersSchema = {
                         items: {
                             type: 'object',
                             properties: {
-                                id: userID,
+                                id: IDProp,
                                 bio: userBioData,
                                 system: userSystemData,
                                 roleProperties: userRolePropertiesData,
@@ -981,7 +973,7 @@ export const GetUserSchema = {
                     user: {
                         type: 'object',
                         properties: {
-                            id: userID,
+                            id: IDProp,
                             bio: userBioData,
                             system: userSystemData,
                             roleProperties: userRolePropertiesData,

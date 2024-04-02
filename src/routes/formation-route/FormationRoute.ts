@@ -20,7 +20,7 @@ const FormationRoutes: FastifyPluginAsync = async (fastify: FastifyInstance, opt
             if(formationData){
                 //TODO: notify other systems
 
-                req.log.info(`[SA-Auth] Added new formation, ID: ${formationData.id}`);
+                req.log.info({ actor: 'Route: formation' }, `Added new formation, ID: ${formationData.id}`);
                 return rep.code(200).send({statusCode: 200, data: { formation: formationData } })
             }
 
@@ -38,7 +38,7 @@ const FormationRoutes: FastifyPluginAsync = async (fastify: FastifyInstance, opt
             if(formationsData){
                 //TODO: notify other systems
 
-                req.log.info(`[SA-Auth] Added group of new formations, ID: ${formationsData.map(f => f.id).join(', ')}`);
+                req.log.info({ actor: 'Route: formation' }, `Added group of new formations, ID: ${formationsData.map(f => f.id).join(', ')}`);
                 return rep.code(200).send({statusCode: 200, data: { formations: formationsData } })
             }
 
@@ -55,7 +55,7 @@ const FormationRoutes: FastifyPluginAsync = async (fastify: FastifyInstance, opt
             if(formationData){
                 //TODO: notify other systems
 
-                req.log.info(`[SA-Auth] Add new positions to formation, ID: ${req.body.data.id}`);
+                req.log.info({ actor: 'Route: formation' }, `Add new positions to formation, ID: ${req.body.data.id}`);
                 return rep.code(200).send({statusCode: 200, data: { OK: true, params: formationData } })
             }
 
@@ -75,7 +75,7 @@ const FormationRoutes: FastifyPluginAsync = async (fastify: FastifyInstance, opt
             if(formationData){
                 //TODO: notify other systems
 
-                req.log.info(`[SA-Auth] Delete formations, ID: ${formationID}`);
+                req.log.info({ actor: 'Route: formation' }, `Delete formation, ID: ${formationID}`);
                 return rep.code(200).send({statusCode: 200, data: { OK: true, params: formationData } })
             }
 
@@ -94,7 +94,7 @@ const FormationRoutes: FastifyPluginAsync = async (fastify: FastifyInstance, opt
             if(formationsData){
                 //TODO: notify other systems
 
-                req.log.info(`[SA-Auth] Delete formations, ID: ${formationsID.join(', ')}`);
+                req.log.info({ actor: 'Route: formation' }, `Delete formations, ID: ${formationsID.join(', ')}`);
                 return rep.code(200).send({statusCode: 200, data: { OK: true, params: formationsData } })
             }
 
@@ -112,7 +112,7 @@ const FormationRoutes: FastifyPluginAsync = async (fastify: FastifyInstance, opt
             if(formationData){
                 //TODO: notify other systems
 
-                req.log.info(`[SA-Auth] Delete positions in formation, ID: ${id}`);
+                req.log.info({ actor: 'Route: formation' }, `Delete positions in formation, ID: ${id}`);
                 return rep.code(200).send({statusCode: 200, data: { OK: true, formation: formationData } })
             }
 
@@ -132,7 +132,7 @@ const FormationRoutes: FastifyPluginAsync = async (fastify: FastifyInstance, opt
             if(formationData){
                 //TODO: notify other systems
 
-                req.log.info(`[SA-Auth] Edit formation properties, ID: ${formation.id}`)
+                req.log.info({ actor: 'Route: formation' }, `Edit formation properties, ID: ${formation.id}`)
                 return rep.code(200).send({statusCode: 200, data: { OK: true, formation: formationData } })
             }
 
@@ -150,7 +150,7 @@ const FormationRoutes: FastifyPluginAsync = async (fastify: FastifyInstance, opt
             if(formationData){
                 //TODO: notify other systems
 
-                req.log.info(`[SA-Auth] Edit formation positions, ID: ${formation.id}`)
+                req.log.info({ actor: 'Route: formation' }, `Edit formation positions, ID: ${formation.id}`)
                 return rep.code(200).send({statusCode: 200, data: { OK: true, params: formationData } })
             }
 
@@ -161,7 +161,7 @@ const FormationRoutes: FastifyPluginAsync = async (fastify: FastifyInstance, opt
     
 
 
-    fastify.get<AuthReqData>('/api/v1/formations/get-all-formations', { preHandler: [authMiddleware, fastify.checkPermission({ permission: UserPermissions.GetAllFormations }) ], schema: GetAllFormationsSchema } , async (req, rep) => {
+    fastify.get<AuthReqData>('/api/v1/formations/get-all-formations', { preHandler: [authMiddleware, fastify.checkPermission({ permission: UserPermissions.AuthGetAllFormations }) ], schema: GetAllFormationsSchema } , async (req, rep) => {
         try {
 
             const formations = await getAllFormations()
@@ -173,7 +173,7 @@ const FormationRoutes: FastifyPluginAsync = async (fastify: FastifyInstance, opt
         }
     })
     
-    fastify.get<GetReqWithQueryParams<ArrayOfFormationsID>>('/api/v1/formations/get-formations', { preHandler: [authMiddleware, fastify.checkPermission({ permission: UserPermissions.GetFormations }) ], schema: GetFormationsSchema } , async (req, rep) => {
+    fastify.get<GetReqWithQueryParams<ArrayOfFormationsID>>('/api/v1/formations/get-formations', { preHandler: [authMiddleware, fastify.checkPermission({ permission: UserPermissions.AuthGetFormations }) ], schema: GetFormationsSchema } , async (req, rep) => {
         try {
             const formationsID = req.query.formations
             const formations = await getFormations(formationsID)
@@ -184,7 +184,7 @@ const FormationRoutes: FastifyPluginAsync = async (fastify: FastifyInstance, opt
         }
     })
     
-    fastify.get<GetReqWithQueryParams<FormationID>>('/api/v1/formations/formation', { preHandler: [authMiddleware, fastify.checkPermission({ permission: UserPermissions.GetFormation }) ], schema: GetFormationSchema } , async (req, rep) => {
+    fastify.get<GetReqWithQueryParams<FormationID>>('/api/v1/formations/formation', { preHandler: [authMiddleware, fastify.checkPermission({ permission: UserPermissions.AuthGetFormation }) ], schema: GetFormationSchema } , async (req, rep) => {
         try {
             const formationID = req.query.id
             const formation = await getFormation(formationID)

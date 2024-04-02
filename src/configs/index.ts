@@ -8,7 +8,14 @@ const transport = pino.transport({
     {
       target: 'pino/file',
       options: {
-        destination: path.join(__dirname, `../logs/logs-${getDate()}.log`),
+        destination: path.join(__dirname, `../logs/general/logs-${getDate()}.log`),
+      }
+    },
+    {
+      target: 'pino/file',
+      level: 'error',
+      options: {
+        destination: path.join(__dirname, `../logs/errors/errors-logs-${getDate()}.log`),
       }
     },
     {

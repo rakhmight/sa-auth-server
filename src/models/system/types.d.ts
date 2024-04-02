@@ -4,7 +4,9 @@ declare interface SystemI{
     name: Array<InternationalNameValue>,
     token: string,
     type: import('./enums').SystemType,
-    IP4Address: string
+    IP4Address: string,
+    
+    receiveNotifications: boolean
 }
 
 declare interface SystemIDoc extends SystemI, DocumentExC{

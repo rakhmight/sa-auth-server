@@ -137,3 +137,28 @@ export const UnauthorizedError = {
     },
   },
 };
+
+export const nameProp = {
+  type: 'array',
+  items: {
+      type: 'object',
+      properties: {
+          ISOCode: {
+              type: 'string',
+              enum: ['RU', 'EN', 'UZ', 'FR', 'DE', 'JP', 'CN', 'KR', 'IT', 'BY', 'IN', 'UA', 'TJ', 'TR', 'TM', 'KZ', 'AF', 'AZ', 'IR', 'IQ']
+          },
+          value: {
+              type: 'string',
+              minLength: 7
+          }
+      },
+      required: ['ISOCode', 'value']
+  },
+  minItems: 1
+}
+
+export const IDProp = {
+  type: 'string',
+  format: 'uuid',
+  pattern: '^[0-9a-fA-F]{24}$'
+}

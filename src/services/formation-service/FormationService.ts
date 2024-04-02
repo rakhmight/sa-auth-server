@@ -25,7 +25,7 @@ export async function addFormations(formationsData:Array<FormationAdd>){
 export async function addFormationPositions(formationData: FormationPositionsAdd){
     const formation = await FormationModel.findById(formationData.id)
 
-    if(!formation) throw Error('not-found')
+    if(!formation) throw Error('formation-not-found')
 
     let lastPositionID = formation.counter+1
     const positionsData = formationData.positions.map(position => {
@@ -54,9 +54,9 @@ export async function deleteFormation(formationID: Schema.Types.ObjectId){
     return formationData
 }
 export async function deleteFormations(formations: Array<Schema.Types.ObjectId>){
-    const formationData = await FormationModel.deleteMany({ _id: { $in: formations } })
+    const formationsData = await FormationModel.deleteMany({ _id: { $in: formations } })
 
-    return formationData
+    return formationsData
 }
 export async function deleteFormationPositions(formation: Schema.Types.ObjectId, positions: Array<FormationPositionID>){
     const formationData = await FormationModel.findOneAndUpdate({ _id: formation }, {
@@ -65,7 +65,7 @@ export async function deleteFormationPositions(formation: Schema.Types.ObjectId,
         }
     })
 
-    if(!formationData) throw Error('not-found')
+    if(!formationData) throw Error('formation-not-found')
     const preparedFormationData = prepareFormationData(formationData)
 
     return preparedFormationData
@@ -75,9 +75,6 @@ export async function editFormation(formationData:FormationEdit) {
     const formationTmp: Omit<FormationEdit, 'id'> = {}
     
     if(Object.keys(formationData).length < 0) throw new Error('bad-req')
-    const formationCandidate = await FormationModel.findById(formationData.id)
-
-    if(!formationCandidate) throw Error('not-found')
 
     if(formationData.name) formationTmp.name = formationData.name
     if(formationData.type) formationTmp.type = formationData.type
@@ -90,7 +87,7 @@ export async function editFormation(formationData:FormationEdit) {
         { ...formationTmp }
     )
 
-    if(!updatedFormation) throw Error('not-found')
+    if(!updatedFormation) throw Error('formation-not-found')
     const preparedFormationData = prepareFormationData(updatedFormation)
 
     return preparedFormationData
@@ -111,7 +108,7 @@ export async function editFormationPosition(formationData: FormationPositionEdit
         }
     )
 
-    if(!updatedFormation) throw Error('not-found')
+    if(!updatedFormation) throw Error('formation-not-found')
     const preparedFormationData = prepareFormationData(updatedFormation)
 
     return preparedFormationData
@@ -120,29 +117,22 @@ export async function editFormationPosition(formationData: FormationPositionEdit
 export async function getAllFormations(){
     const formations = await FormationModel.find()
 
-    const formationsDTO:Array<FormationDTOI> = formations.map((formation) => {
-        return FormationDTO(formation)
-    })
-
+    const formationsDTO:Array<FormationDTOI> = formations.map(formation => FormationDTO(formation))
     return formationsDTO
 }
-export async function getFormations(formationsID: Array<Schema.Types.ObjectId>){
-    const formations = await FormationModel.find(
-        { _id: { $in: formationsID } }
+export async function getFormations(formations: Array<Schema.Types.ObjectId>){
+    const formationsData = await FormationModel.find(
+        { _id: { $in: formations } }
     )
 
-    const formationsDTO:Array<FormationDTOI> = formations.map((formation) => {
-        return FormationDTO(formation)
-    })
-
+    const formationsDTO:Array<FormationDTOI> = formationsData.map(formation => FormationDTO(formation))
     return formationsDTO
 }
 export async function getFormation(formationID: Schema.Types.ObjectId){
-    const formation = await FormationModel.findOne(formationID)
+    const formation = await FormationModel.findById(formationID)
     if(!formation) throw Error('formation-not-found')
 
     const formationDTO:FormationDTOI = FormationDTO(formation)
-
     return formationDTO
 }
 

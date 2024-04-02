@@ -1,29 +1,4 @@
-import { BadRequestError, AccessDeniedError, InternalServerError, HeadersSchema, UnauthorizedError, NotFoundError } from "../schemas"
-
-const nameProp = {
-    type: 'array',
-    items: {
-        type: 'object',
-        properties: {
-            ISOCode: {
-                type: 'string',
-                enum: ['RU', 'EN', 'UZ', 'FR', 'DE', 'JP', 'CN', 'KR', 'IT', 'BY', 'IN', 'UA', 'TJ', 'TR', 'TM', 'KZ', 'AF', 'AZ', 'IR', 'IQ']
-            },
-            value: {
-                type: 'string',
-                minLength: 7
-            }
-        },
-        required: ['ISOCode', 'value']
-    },
-    minItems: 1
-}
-
-const formationID = {
-    type: 'string',
-    format: 'uuid',
-    pattern: '^[0-9a-fA-F]{24}$'
-}
+import { BadRequestError, AccessDeniedError, InternalServerError, HeadersSchema, UnauthorizedError, NotFoundError, nameProp, IDProp } from "../schemas"
 
 const formationPositions = {
     type: 'array',
@@ -44,7 +19,7 @@ const formationData = {
         enum: ['lead', 'administration', 'center', 'department', 'branch', 'group', 'squad', 'unit', 'service', 'faculty', 'chair', 'formation']
     },
     positions: formationPositions,
-    ref: formationID,
+    ref: IDProp,
     generation: {
         type: 'number',
         minimum: 1
@@ -84,7 +59,7 @@ export const AddFormationSchema = {
                     formation:{
                         type: 'object',
                         properties: {
-                            id: formationID,
+                            id: IDProp,
                             ...formationData
                         }
                     }
@@ -135,18 +110,13 @@ export const AddFormationsSchema = {
             data: {
                 type: 'object',
                 properties: {
-                    formation:{
-                        type: 'object',
-                        properties: {
-                            formations: {
-                                type: 'array',
-                                items: {
-                                    type: 'object',
-                                    properties: {
-                                        id: formationID,
-                                        ...formationData
-                                    }
-                                }
+                    formations: {
+                        type: 'array',
+                        items: {
+                            type: 'object',
+                            properties: {
+                                id: IDProp,
+                                ...formationData
                             }
                         }
                     }
@@ -173,7 +143,7 @@ export const AddFormationPositionsSchema = {
             data: {
                 type: 'object',
                 properties:{
-                    id: formationID,
+                    id: IDProp,
                     positions: formationPositions
                 },
                 required: ['id', 'positions']
@@ -193,7 +163,7 @@ export const AddFormationPositionsSchema = {
                     formation:{
                         type: 'object',
                         properties: {
-                            id: formationID,
+                            id: IDProp,
                             ...formationData
                         }
                     }
@@ -223,7 +193,7 @@ export const DeleteFormationSchema = {
             data: {
                 type: 'object',
                 properties:{
-                    id: formationID
+                    id: IDProp
                 },
                 required: ['id']
             }
@@ -277,10 +247,7 @@ export const DeleteFormationsSchema = {
                 properties:{
                     formations: {
                         type: 'array',
-                        items: {
-                            type: 'string',
-                            format: 'uuid'
-                        },
+                        items: IDProp,
                         minItems: 1,
                         uniqueItems: true
                     }
@@ -335,7 +302,7 @@ export const DeleteFormationPositionsSchema = {
             data: {
                 type: 'object',
                 properties:{
-                    id: formationID,
+                    id: IDProp,
                     positions: {
                         type: 'array',
                         items: {
@@ -367,7 +334,7 @@ export const DeleteFormationPositionsSchema = {
                     formation: {
                         type: 'object',
                         properties: {
-                            id: formationID,
+                            id: IDProp,
                             ...formationData
                         }
                     }
@@ -397,7 +364,7 @@ export const EditFormationSchema = {
             data: {
                 type: 'object',
                 properties:{
-                    id: formationID,
+                    id: IDProp,
                     ...formationData
                 },
                 required: ['id']
@@ -421,7 +388,7 @@ export const EditFormationSchema = {
                     formation: {
                         type: 'object',
                         properties: {
-                            id: formationID,
+                            id: IDProp,
                             ...formationData
                         }
                     }
@@ -449,7 +416,7 @@ export const EditFormationPositionSchema = {
             data: {
                 type: 'object',
                 properties:{
-                    id: formationID,
+                    id: IDProp,
                     position: {
                         type: 'object',
                         properties: {
@@ -483,7 +450,7 @@ export const EditFormationPositionSchema = {
                     formation: {
                         type: 'object',
                         properties: {
-                            id: formationID,
+                            id: IDProp,
                             ...formationData
                         }
                     }
@@ -520,7 +487,7 @@ export const GetAllFormationsSchema = {
                         items: {
                             type: 'object',
                             properties: {
-                                id: formationID,
+                                id: IDProp,
                                 ...formationData
                             }
                         }
@@ -546,10 +513,7 @@ export const GetFormationsSchema = {
         properties: {
             formations: {
                 type: 'array',
-                items: {
-                    type: 'string',
-                    format: 'uuid'
-                },
+                items: IDProp,
                 minItems: 1,
                 uniqueItems: true
             }
@@ -570,7 +534,7 @@ export const GetFormationsSchema = {
                         items: {
                             type: 'object',
                             properties: {
-                                id: formationID,
+                                id: IDProp,
                                 ...formationData
                             }
                         }
@@ -594,10 +558,7 @@ export const GetFormationSchema = {
     querystring: {
         type: 'object',
         properties: {
-            id: {
-                type: 'string',
-                format: 'uuid'
-            }
+            id: IDProp
         },
         required: ['id']
     },
@@ -613,7 +574,7 @@ export const GetFormationSchema = {
                     formation: {
                         type: 'object',
                         properties: {
-                            id: formationID,
+                            id: IDProp,
                             ...formationData
                         }
                     }

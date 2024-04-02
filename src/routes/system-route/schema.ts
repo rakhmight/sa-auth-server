@@ -1,14 +1,34 @@
 import { BadRequestError, AccessDeniedError, InternalServerError, HeadersSchema, UnauthorizedError, NotFoundError, nameProp, IDProp } from "../schemas"
 
-const specialtyData = {
+const systemData = {
     name: nameProp,
-    ref: IDProp,
+    login: {
+        type: 'string',
+        pattern: '^[a-z]{2}-[a-z]+((-[a-z]+)+)?$'
+    },
+    type: {
+        type: 'string',
+        enum: ['server', 'client']
+    },
+    IP4Address: {
+        type: 'string',
+        pattern: '^((((http|https):\/\/)?((25[0-5]|2[0-4][0-9]|[0-1]?[0-9]?[0-9])\.){3}(25[0-5]|2[0-4][0-9]|[0-1]?[0-9]?[0-9])(:[0-9][0-9][0-9][0-9])?)|(((http|https):\/\/)?((www\.([a-zA-Z0-9\-]{2,63}\.)+[a-zA-Z]{2,63})|(([a-zA-Z0-9\-]{2,63}\.)+[a-zA-Z]{2,63}))(\.[a-zA-Z]{2,63})?))$'
+    },
+    receiveNotifications: {
+        type: 'boolean'
+    }
 }
 
-export const AddSpecialtySchema = {
-    summary: 'Add a new specialty',
-    description: 'Add a new specialty',
-    tags: ['Specialty route'],
+const systemToken = {
+    type: 'string',
+    minLength: 36,
+    maxLength: 36
+}
+
+export const AddSystemSchema = {
+    summary: 'Add a new system',
+    description: 'Add a new system',
+    tags: ['System route'],
     headers: HeadersSchema,
     body: {
         description: 'Request body data',
@@ -16,8 +36,8 @@ export const AddSpecialtySchema = {
         properties: {
             data: {
                 type: 'object',
-                properties: specialtyData,
-                required: ['name', 'ref']
+                properties: systemData,
+                required: ['name', 'login', 'type', 'IP4Address', 'receiveNotifications']
             }
         },
         required: ['data']
@@ -35,7 +55,8 @@ export const AddSpecialtySchema = {
                         type: 'object',
                         properties: {
                             id: IDProp,
-                            ...specialtyData
+                            token: systemToken,
+                            ...systemData
                         }
                     }
                 }
@@ -49,10 +70,10 @@ export const AddSpecialtySchema = {
         500: InternalServerError
     }
 }
-export const AddSpecialtiesSchema = {
-    summary: 'Add a new specialties',
-    description: 'Add group of new specialties',
-    tags: ['Specialty route'],
+export const AddSystemsSchema = {
+    summary: 'Add a new systems',
+    description: 'Add group of new systems',
+    tags: ['System route'],
     headers: HeadersSchema,
     body: {
         description: 'Request body data',
@@ -61,17 +82,17 @@ export const AddSpecialtiesSchema = {
             data: {
                 type: 'object',
                 properties: {
-                    specialties: {
+                    systems: {
                         type: 'array',
                         items: {
                             type: 'object',
-                            properties: specialtyData,
-                            required: ['name', 'ref']
+                            properties: systemData,
+                            required: ['name', 'login', 'type', 'IP4Address', 'receiveNotifications']
                         },
                         minItems: 1
                     }
                 },
-                required: ['specialties']
+                required: ['systems']
             }
         },
         required: ['data']
@@ -85,13 +106,14 @@ export const AddSpecialtiesSchema = {
             data: {
                 type: 'object',
                 properties: {
-                    specialties:{
+                    systems:{
                         type: 'array',
                         items: {
                             type: 'object',
                             properties: {
                                 id: IDProp,
-                                ...specialtyData
+                                token: systemToken,
+                                ...systemData
                             }
                         }
                     }
@@ -107,10 +129,62 @@ export const AddSpecialtiesSchema = {
     }
 }
 
-export const DeleteSpecialtySchema = {
+export const RefreshSystemTokenSchema = {
+    summary: 'Refresh token',
+    description: 'Refresh system token',
+    tags: ['System route'],
+    headers: HeadersSchema,
+    body: {
+        description: 'Request body data',
+        type: 'object',
+        properties: {
+            data: {
+                type: 'object',
+                properties:{
+                    id: IDProp
+                },
+                required: ['id']
+            }
+        },
+        required: ['data']
+    },
+    response: {
+        200: {
+          description: 'Successful response',
+          type: 'object',
+          properties: {
+            statusCode: { type: 'integer', default: 200 },
+            data: {
+                type: 'object',
+                properties: {
+                    OK: {
+                        type: 'boolean',
+                        default: true
+                    },
+                    system: {
+                        type: 'object',
+                        properties: {
+                            id: IDProp,
+                            ...systemData
+                        }
+                    }
+                }
+            }
+          }
+        },
+    
+        400: BadRequestError,
+        401: UnauthorizedError,
+        403: AccessDeniedError,
+        404: NotFoundError,
+        500: InternalServerError
+    }
+}
+
+export const DeleteSystemSchema = {
     summary: 'Delete',
-    description: 'Delete specialty',
-    tags: ['Specialty route'],
+    description: 'Delete system',
+    tags: ['System route'],
     headers: HeadersSchema,
     body: {
         description: 'Request body data',
@@ -159,10 +233,10 @@ export const DeleteSpecialtySchema = {
         500: InternalServerError
     }
 }
-export const DeleteSpecialtiesSchema = {
+export const DeleteSystemsSchema = {
     summary: 'Multi delete',
-    description: 'Delete list of specialties',
-    tags: ['Specialty route'],
+    description: 'Delete list of systems',
+    tags: ['System route'],
     headers: HeadersSchema,
     body: {
         description: 'Request body data',
@@ -171,14 +245,14 @@ export const DeleteSpecialtiesSchema = {
             data: {
                 type: 'object',
                 properties:{
-                    specialties: {
+                    systems: {
                         type: 'array',
                         items: IDProp,
                         minItems: 1,
                         uniqueItems: true
                     }
                 },
-                required: ['specialties']
+                required: ['systems']
             }
         },
         required: ['data']
@@ -217,10 +291,10 @@ export const DeleteSpecialtiesSchema = {
     }
 }
 
-export const EditSpecialtySchema = {
-    summary: 'Edit specialty',
-    description: 'Edit specialty properties',
-    tags: ['Specialty route'],
+export const EditSystemSchema = {
+    summary: 'Edit system',
+    description: 'Edit system properties',
+    tags: ['System route'],
     headers: HeadersSchema,
     body: {
         description: 'Request body data',
@@ -230,7 +304,7 @@ export const EditSpecialtySchema = {
                 type: 'object',
                 properties:{
                     id: IDProp,
-                    ...specialtyData
+                    ...systemData
                 },
                 required: ['id']
             }
@@ -250,11 +324,11 @@ export const EditSpecialtySchema = {
                         type: 'boolean',
                         default: true
                     },
-                    specialty: {
+                    system: {
                         type: 'object',
                         properties: {
                             id: IDProp,
-                            ...specialtyData
+                            ...systemData
                         }
                     }
                 }
@@ -270,10 +344,10 @@ export const EditSpecialtySchema = {
     }
 }
 
-export const GetAllSpecialtiesSchema = {
-    summary: 'Get full specialties list',
-    description: 'Get all specialties from DB',
-    tags: ['Specialty route'],
+export const GetAllSystemsSchema = {
+    summary: 'Get full systems list',
+    description: 'Get all systems from DB',
+    tags: ['System route'],
     headers: HeadersSchema,
     response: {
         200: {
@@ -284,13 +358,13 @@ export const GetAllSpecialtiesSchema = {
             data: {
                 type: 'object',
                 properties: {
-                    specialties: {
+                    systems: {
                         type: 'array',
                         items: {
                             type: 'object',
                             properties: {
                                 id: IDProp,
-                                ...specialtyData
+                                ...systemData
                             }
                         }
                     }
@@ -305,22 +379,22 @@ export const GetAllSpecialtiesSchema = {
         500: InternalServerError
     }
 }
-export const GetSpecialtiesSchema = {
-    summary: 'Get custom specialties list',
-    description: 'Get specialties list from DB by ID from query param',
-    tags: ['Specialty route'],
+export const GetSystemsSchema = {
+    summary: 'Get custom systems list',
+    description: 'Get systems list from DB by ID from query param',
+    tags: ['System route'],
     headers: HeadersSchema,
     querystring: {
         type: 'object',
         properties: {
-            specialties: {
+            systems: {
                 type: 'array',
                 items: IDProp,
                 minItems: 1,
                 uniqueItems: true
             }
         },
-        required: ['specialties']
+        required: ['systems']
     },
     response: {
         200: {
@@ -337,7 +411,7 @@ export const GetSpecialtiesSchema = {
                             type: 'object',
                             properties: {
                                 id: IDProp,
-                                ...specialtyData
+                                ...systemData
                             }
                         }
                     }
@@ -352,10 +426,10 @@ export const GetSpecialtiesSchema = {
         500: InternalServerError
     }
 }
-export const GetSpecialtySchema = {
-    summary: 'Get specialty data',
-    description: 'Get specialty data from DB by ID from query param',
-    tags: ['Specialty route'],
+export const GetSystemSchema = {
+    summary: 'Get system data',
+    description: 'Get system data from DB by ID from query param',
+    tags: ['System route'],
     headers: HeadersSchema,
     querystring: {
         type: 'object',
@@ -373,11 +447,11 @@ export const GetSpecialtySchema = {
             data: {
                 type: 'object',
                 properties: {
-                    specialty: {
+                    system: {
                         type: 'object',
                         properties: {
                             id: IDProp,
-                            ...specialtyData
+                            ...systemData
                         }
                     }
                 }

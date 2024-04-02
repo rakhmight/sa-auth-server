@@ -43,16 +43,39 @@ export enum UserPermissions {
     AuthEditFormation = 'sa-auth-edit_formation', // edit formation
     AuthEditFormationPosition = 'sa-auth-edit_formation_position', // edit formation position
     
-    GetAllFormations = 'sa-auth-get_all_formations', // get all formations list
-    GetFormations = 'sa-auth-get_formations', // get formations list
-    GetFormation = 'sa-auth-get_formation', // get formations data
+    AuthGetAllFormations = 'sa-auth-get_all_formations', // get all formations list
+    AuthGetFormations = 'sa-auth-get_formations', // get formations list
+    AuthGetFormation = 'sa-auth-get_formation', // get formations data
 
 
 
-    // SPECIALTY'S
+    // SPECIALTIES
+    AuthAddSpecialty = 'sa-auth-add_specialty', // add specialty
+    AuthAddSpecialties = 'sa-auth-add_specialties', // add specialties []
+
+    AuthDeleteSpecialty = 'sa-auth-delete_specialty', // delete specialty
+    AuthDeleteSpecialties = 'sa-auth-delete-specialties', // delete specialties []
+
+    AuthEditSpecialty = 'sa-auth-edit_specialty', // edit specialty
+
+    AuthGetAllSpecialties = 'sa-auth-get_all_specialties', // get all specialties list
+    AuthGetSpecialties = 'sa-auth-get-specialties', // get specialties list
+    AuthGetSpecialty = 'sa-auth-specialty', // get specialty data
 
 
     // SYSTEMS
+    AuthAddSystem = 'sa-auth-add_system', // add system
+    AuthAddSystems = 'sa-auth-add_systems', // add systems []
+
+    AuthRefreshSystemToken = 'sa-auth-refresh_system_token', // refresh system token
+
+    AuthDeleteSystem = 'sa-auth-delete_system', // delete system
+    AuthDeleteSystems = 'sa-auth-delete_systems', // delete systems []
+
+    AuthEditSystem = 'sa-auth-edit_system', // edit system
+    AuthGetAllSystems = 'sa-auth-get_all_systems', // get all systems list
+    AuthGetSystems = 'sa-auth-get-systems', // get systems list
+    AuthGetSystem = 'sa-auth-get-system' // get system
 }
 
 export enum StudentEducationForms {

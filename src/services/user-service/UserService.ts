@@ -70,29 +70,22 @@ export async function refresh(refreshToken:string, userID:Schema.Types.ObjectId,
 export async function getAllUsers() {
     const users = await UserModel.find()
 
-    const usersDTO:Array<UserDTOI> = users.map((user) => {
-        return UserDTO(user)
-    })
-
+    const usersDTO:Array<UserDTOI> = users.map(user => UserDTO(user))
     return usersDTO
 }
-export async function getUsers(usersID:Array<Schema.Types.ObjectId>) {
-    const users = await UserModel.find(
-        { _id: { $in: usersID } }
+export async function getUsers(users:Array<Schema.Types.ObjectId>) {
+    const usersData = await UserModel.find(
+        { _id: { $in: users } }
     )
 
-    const usersDTO:Array<UserDTOI> = users.map((user) => {
-        return UserDTO(user)
-    })
-
+    const usersDTO:Array<UserDTOI> = usersData.map(user => UserDTO(user))
     return usersDTO
 }
 export async function getUser(userID:Schema.Types.ObjectId) {
-    const user = await UserModel.findOne(userID)
+    const user = await UserModel.findById(userID)
     if(!user) throw Error('user-not-found')
 
     const userDTO:UserDTOI = UserDTO(user)
-
     return userDTO
 }
 
