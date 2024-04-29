@@ -16,6 +16,10 @@ enum NotificationType {
     DeleteSpecialties = 'delete-specialties'
 }
 
-export async function notificationSystems(type:NotificationType){
+export async function notificationSystems(data:never, type:NotificationType){
     // /api/v1/notifications/auth-add-users
+
+    // prepared data
+
+    // send data
 }

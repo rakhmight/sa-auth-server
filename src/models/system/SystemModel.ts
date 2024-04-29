@@ -47,6 +47,11 @@ const schema: Schema = new Schema<SystemI>(
         receiveNotifications: {
             type: Boolean,
             required: true
+        },
+        publicSignKey: {
+            type: 'string',
+            minLength: 1024,
+            maxLength: 1024,
         }
     },
     { 

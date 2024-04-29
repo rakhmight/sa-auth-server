@@ -43,7 +43,7 @@ export async function login(loginData:UserLogin, jwt:JWT, redis:FastifyRedis){
     const isPasswordEquals = await user.comparePasswords(user.auth.password, loginData.auth.password)
     if(!isPasswordEquals) throw Error('pwd-wrong')
     
-    const preparedUserData = await prepareFullUserData(user, jwt, redis,)
+    const preparedUserData = await prepareFullUserData(user, jwt, redis)
 
     return preparedUserData
 }

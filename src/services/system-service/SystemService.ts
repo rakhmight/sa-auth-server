@@ -59,6 +59,7 @@ export async function editSystem(systemData: SystemEdit){
     if(systemData.IP4Address) systemTmp.IP4Address = systemData.IP4Address
     if(systemData.login) systemTmp.login = systemData.login
     if(systemData.receiveNotifications) systemTmp.receiveNotifications = systemData.receiveNotifications
+    if(systemData.publicSignKey) systemTmp.publicSignKey = systemData.publicSignKey
 
     const updatedSystem = await SystemModel.findOneAndUpdate(
         { _id: systemData.id },
@@ -110,6 +111,7 @@ function validateSystem (systemData: SystemAdd):Omit<SystemI, "_id">{
         type: systemData.type,
         IP4Address: systemData.IP4Address,
         receiveNotifications: systemData.receiveNotifications,
-        token: generateRandomString(36)
+        token: generateRandomString(36),
+        publicSignKey: systemData.publicSignKey
     }
 }

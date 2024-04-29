@@ -6,7 +6,8 @@ declare interface SystemI{
     type: import('./enums').SystemType,
     IP4Address: string,
     
-    receiveNotifications: boolean
+    receiveNotifications: boolean,
+    publicSignKey: string
 }
 
 declare interface SystemIDoc extends SystemI, DocumentExC{
